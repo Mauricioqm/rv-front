@@ -8,7 +8,6 @@ import logo from '../assets/rv.jpg';
 function Header() {
   const user = useSelector((state) => state.user);
   const [logoutUser] = useLogoutUserMutation();
-  console.log(user);
 
   async function handleLogout(event) {
     event.preventDefault();

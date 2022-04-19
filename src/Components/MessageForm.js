@@ -2,8 +2,13 @@ import React, { useState, useContext, useRef, useEffect,  } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 import { AppContext } from '../context/appContext';
+import { GiphyFetch } from '@giphy/js-fetch-api';
+import TextList from './textList';
+import Error from './error';
 
 import './messageForm.css';
+
+const giphy = new GiphyFetch('JZpprN7fERPZO8RliOKomWPBvPphqqFM');
 
 function MessageForm() {
 
@@ -12,7 +17,16 @@ function MessageForm() {
   const {socket, currentRoom, setMessages, messages, privateMemberMsg} = useContext(AppContext);
   const messageEndRef = useRef(null);
 
-  console.log(privateMemberMsg);
+
+
+
+  const [text, setText] = useState('')
+  const [textLength, setTextLength] = useState(0)
+  const [results, setResults] = useState([])
+  const [err, setErr] = useState(false);
+
+
+
 
   useEffect(() => {
     scrollToBottom();
@@ -40,7 +54,6 @@ function MessageForm() {
   const todayDate = getFormattedDate();
 
   socket.off('room-messages').on('room-messages', (roomMessages) => {
-    console.log(roomMessages);
     setMessages(roomMessages);
   })
 
@@ -53,6 +66,29 @@ function MessageForm() {
     const roomId = currentRoom;
     socket.emit('message-room', roomId, message, user, time, todayDate);
     setMessage("");
+
+console.log(message);
+
+    if(message === '') {
+      console.log('length is 0, please insert text before submitting')
+      //set error state to true
+      setErr(true)
+      return
+    }
+
+    console.log(text)
+
+    const apiCall = async () => {
+      const res = await giphy.animate(message, {limit: 20})
+      console.log(res)
+
+      setResults(res.data)
+    }
+
+    apiCall()
+    //change error state back to false
+    setText('')
+    setErr(false);
   }
 
   function scrollToBottom() {
@@ -66,6 +102,7 @@ function MessageForm() {
         {user && !privateMemberMsg?.id &&
           <>
             <div className='alert alert-info conversation-info'>
+              {results && <TextList gifs={results} />}
               <div>
                 {/* Chat con {privateMemberMsg.username} <img src={privateMemberMsg.picture} alt="" className='conversation-profile-pic'/> */}
               </div>

@@ -12,8 +12,7 @@ function Sidebar() {
   const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const { setMembers, members, setCurrentRoom, setRooms, privateMemberMsg, rooms, setPrivateMemberMsg, currentRoom } = useContext(AppContext);
-  console.log(user);
-  console.log(members);
+
   function joinRoom(room, isPublic = true){
     if(!user){
       return alert("Por favor inicie sesión");
